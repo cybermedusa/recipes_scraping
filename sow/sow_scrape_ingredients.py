@@ -1,28 +1,53 @@
 from bs4 import BeautifulSoup
 from requests import get
 from sow_scrape_titles import links_list
-from csv import writer
+import json
 
-with open('sow_ingredients.csv', 'w', encoding='utf-8', newline='') as f:
-    thewriter = writer(f)
-    header = ['ingredients']
-    thewriter.writerow(header)
 
-    for link in links_list:
-        new_page = get(link)
-        b_s = BeautifulSoup(new_page.content, 'html.parser')
-        for ingredient in b_s.find_all('div', class_='ingredients-body'):
-            ing_list = []
-            for i in range(0, len(ingredient.contents)):
+def get_ingredients(arr):
+    ingredients = []
+    for ing in arr[:-1]:
+        if '\n' in ing:
+            ing = ing.replace('\n', '')
+            ingredients.append({
+                "text": ing
+            })
+        else:
+            ingredients.append({
+                "text": ing
+            })
+    return ingredients
 
-                if ingredient.contents[i].get_text().strip() != '':
-                    ingredients = ingredient.contents[i].get_text().strip()
-                    ingredients = ingredients.replace('\n\n', '\n')
-                    ingredients = ingredients.replace(',', '\n')
-                    ing_list.append(ingredients)
 
-                else:
-                    ' '.join(ing_list)
+recipes = []
+recipe = []
 
-            info = ing_list
-            thewriter.writerow(info)
+for link in links_list[:150]:
+    new_page = get(link)
+    b_s = BeautifulSoup(new_page.content, 'html.parser')
+    recipe = []
+    contents = list(filter(lambda x: x != '\n', b_s.select_one(".ingredients-body").contents))
+
+    if len(contents) % 2 != 0:
+        contents.insert(0, 'Ingredients')
+
+    for i in range(0, len(contents), 2):
+        title = contents[i]
+        content = contents[i + 1]
+
+        recipe_obj = {
+            "title": '',
+            "content": ''
+        }
+        title = title if contents[i] == 'Ingredients' else title.get_text()
+        recipe_obj['title'] = title
+        content = content.get_text().split('\n\n')
+        recipe_obj['content'] = get_ingredients(content)
+        recipe.append(recipe_obj)
+    recipes.append(recipe)
+
+json_object = json.dumps(recipes, indent=4)
+
+# Writing to sample.json
+with open("ingredients.json", "w") as outfile:
+    outfile.write(json_object)
