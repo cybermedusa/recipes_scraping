@@ -20,9 +20,9 @@ def get_ingredients(arr):
 
 
 recipes = []
-recipe = []
-
-for link in links_list:
+dishes = []
+len_links = len(links_list)//8
+for link in range(len_links):
     new_page = get(links_list[link])
     b_s = BeautifulSoup(new_page.content, 'html.parser')
     recipe = []
@@ -45,10 +45,16 @@ for link in links_list:
         content = content.get_text().split('\n\n')
         recipe_obj['content'] = get_ingredients(content)
         recipe.append(recipe_obj)
-        recipes.append(recipe)
+    recipes.append(recipe)
 
-    # json_object = json.dumps(recipes, indent=4)
-    #
-    # # Writing to json file
-    # with open("ingredients.json", "w") as outfile:
-    #     outfile.write(json_object)
+    dish = {
+        "name": titles[link],
+        "recipe": recipes
+    }
+    recipes = []
+    dishes.append(dish)
+
+    json_object = json.dumps(dishes, indent=4)
+
+    with open("ingredients_part.json", "w") as outfile:
+        outfile.write(json_object)
