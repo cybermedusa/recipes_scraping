@@ -1,6 +1,6 @@
 from bs4 import BeautifulSoup
 from requests import get
-from sow_scrape_titles import links_list
+from sow_scrape_titles import links_list, titles
 import json
 
 
@@ -22,8 +22,8 @@ def get_ingredients(arr):
 recipes = []
 recipe = []
 
-for link in links_list[:150]:
-    new_page = get(link)
+for link in links_list:
+    new_page = get(links_list[link])
     b_s = BeautifulSoup(new_page.content, 'html.parser')
     recipe = []
     contents = list(filter(lambda x: x != '\n', b_s.select_one(".ingredients-body").contents))
@@ -39,15 +39,16 @@ for link in links_list[:150]:
             "title": '',
             "content": ''
         }
+
         title = title if contents[i] == 'Ingredients' else title.get_text()
         recipe_obj['title'] = title
         content = content.get_text().split('\n\n')
         recipe_obj['content'] = get_ingredients(content)
         recipe.append(recipe_obj)
-    recipes.append(recipe)
+        recipes.append(recipe)
 
-json_object = json.dumps(recipes, indent=4)
-
-# Writing to sample.json
-with open("ingredients.json", "w") as outfile:
-    outfile.write(json_object)
+    # json_object = json.dumps(recipes, indent=4)
+    #
+    # # Writing to json file
+    # with open("ingredients.json", "w") as outfile:
+    #     outfile.write(json_object)
