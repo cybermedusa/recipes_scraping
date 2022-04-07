@@ -6,23 +6,16 @@ import json
 
 def get_ingredients(arr):
     ingredients = []
-    for ing in arr[:-1]:
-        if '\n' in ing:
-            ing = ing.replace('\n', '')
-            ingredients.append({
-                "text": ing
-            })
-        else:
-            ingredients.append({
-                "text": ing
-            })
+    for ing in arr:
+        ingredients.append({
+            "text": ing
+        })
     return ingredients
 
 
 recipes = []
 dishes = []
-len_links = len(links_list)//8
-for link in range(len_links):
+for link in range(len(links_list)):
     new_page = get(links_list[link])
     b_s = BeautifulSoup(new_page.content, 'html.parser')
     recipe = []
@@ -42,8 +35,8 @@ for link in range(len_links):
 
         title = title if contents[i] == 'Ingredients' else title.get_text()
         recipe_obj['title'] = title
-        content = content.get_text().split('\n\n')
-        recipe_obj['content'] = get_ingredients(content)
+        clear_content = [j.get_text().strip() for j in list(filter(lambda x: x != '\n', content.contents))]
+        recipe_obj['content'] = get_ingredients(clear_content)
         recipe.append(recipe_obj)
     recipes.append(recipe)
 
@@ -56,5 +49,5 @@ for link in range(len_links):
 
     json_object = json.dumps(dishes, indent=4)
 
-    with open("ingredients_part.json", "w") as outfile:
+    with open("ingredients_half.json", "w") as outfile:
         outfile.write(json_object)
