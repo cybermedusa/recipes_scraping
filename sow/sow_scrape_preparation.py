@@ -1,26 +1,66 @@
 from bs4 import BeautifulSoup
 from requests import get
 from sow_scrape_titles import links_list
-from csv import writer
+import json
+from sow_merging import h4_links, p_links, ul_links, p_ul_links
 
-with open('sow_preparation.csv', 'w', encoding='utf-8', newline='') as f:
-    thewriter = writer(f)
-    header = ['preparation']
-    thewriter.writerow(header)
+h4 = []
+p = []
+ul = []
+p_ul = []
 
-    for link in links_list:
+
+def fit_scenario(link_arr):
+    global h4, ul, p, p_ul
+
+    for link in link_arr:
         new_page = get(link)
         b_s = BeautifulSoup(new_page.content, 'html.parser')
-        for prep in b_s.find_all('div', class_='method-body'):
-            prep_list = []
-            for i in range(0, len(prep.contents)):
-                if prep.contents[i].get_text().strip() != '':
-                    preparation = prep.contents[i].get_text().strip()
-                    preparation = preparation.replace('\n\n', ',')
-                    preparation = preparation.replace('\n', ',')
-                    prep_list.append(preparation)
-                else:
-                    ' '.join(prep_list)
+        c = list(filter(lambda x: x != '\n', b_s.select_one('.method-body').contents))
+        if c[0].name == 'h4':
+            h4.append(link)
 
-            info = prep_list
-            thewriter.writerow(info)
+        if c[0].name == 'ul':
+            ul.append(link)
+
+        if c[0].name == 'p' and c[1].name != 'ul':
+            p.append(link)
+
+        if c[0].name == 'p' and c[1].name == 'ul':
+            p_ul.append(link)
+
+    return h4, ul, p, p_ul
+
+
+# x = fit_scenario(links_list)
+
+def get_preparation(arr):
+    prep_steps = []
+    for prep in arr:
+        prep_steps.append({
+            "text": prep
+        })
+    return prep_steps
+
+
+recipe_h4 = []
+recipes_h4 = []
+for link in h4_links:
+    new_page = get(link)
+    b_s = BeautifulSoup(new_page.content, 'html.parser')
+    full_content = list(filter(lambda x: x != '\n', b_s.select_one('.method-body').contents))
+    clean_content = list(filter(lambda x: x.name == 'h4' or x.name == 'ul', full_content))
+    sub_obj = {
+        "title": '',
+        "content": ''
+    }
+
+    for i in range(len(clean_content)):
+
+        if clean_content[i].name == 'h4':
+            title = clean_content[i].get_text().strip()
+            sub_obj["title"] = title
+
+        if clean_content[i].name == 'ul':
+            content = [clean_content[i].get_text().strip()]
+            sub_obj["content"] = get_preparation(content)
