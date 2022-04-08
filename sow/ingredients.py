@@ -1,17 +1,8 @@
 from bs4 import BeautifulSoup
 from requests import get
-from sow_scrape_titles import links_list, titles
+from titles import links_list, titles
 import json
-
-
-def get_ingredients(arr):
-    ingredients = []
-    for ing in arr:
-        ingredients.append({
-            "text": ing
-        })
-    return ingredients
-
+from functions import get_value
 
 recipes = []
 dishes = []
@@ -36,7 +27,7 @@ for link in range(len(links_list)):
         title = title if contents[i] == 'Ingredients' else title.get_text()
         recipe_obj['title'] = title
         clear_content = [j.get_text().strip() for j in list(filter(lambda x: x != '\n', content.contents))]
-        recipe_obj['content'] = get_ingredients(clear_content)
+        recipe_obj['content'] = get_value(clear_content)
         recipe.append(recipe_obj)
     recipes.append(recipe)
 
