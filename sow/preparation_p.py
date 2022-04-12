@@ -11,7 +11,7 @@ dishes_preparation = []
 for link in p_with_h4:
     new_page = get(link)
     b_s = BeautifulSoup(new_page.content, 'html.parser')
-    full_content = list(filter(lambda x: x != '\n', b_s.select_one('.method-body').contents))
+    full_content = list(filter(lambda x: x.next.name != "hr" and x != "\n" and x != "hr" and x.name != "hr", b_s.select_one(".method-body").contents))
 
     first_idx = [idx for idx, val in enumerate(full_content) if val.name == "h4"].pop(0)
     last_idx = [idx for idx, val in enumerate(full_content) if val.name == "div"].pop(0)
