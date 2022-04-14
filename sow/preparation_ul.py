@@ -6,7 +6,7 @@ from functions import get_value
 
 recipe_ul = []
 recipes_ul = []
-dishes_preparation = []
+dishes_prep_ul = []
 for link in ul_links:
     new_page = get(link)
     b_s = BeautifulSoup(new_page.content, 'html.parser')
@@ -31,11 +31,11 @@ for link in ul_links:
         "name": link,
         "recipe": recipes_ul
     }
-    dishes_preparation.append(dish)
+    dishes_prep_ul.append(dish)
     recipe_ul = []
     recipes_ul = []
 
-    json_object = json.dumps(dishes_preparation, indent=4)
+    json_object = json.dumps(dishes_prep_ul, indent=4)
 
-    with open("recipes_ul.json", "w") as outfile:
+    with open("preparation_ul.json", "w") as outfile:
         outfile.write(json_object)
