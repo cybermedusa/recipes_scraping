@@ -1,6 +1,7 @@
 import json
 
 files = ["preparation_h4.json", "preparation_p.json", "preparation_ul.json"]
+files_ing = ["ingredients_alone.json", "ingredients_hr.json"]
 
 
 def merge_json(filename):

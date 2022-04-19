@@ -13,8 +13,8 @@ for link in p_with_h4:
     b_s = BeautifulSoup(new_page.content, 'html.parser')
     full_content = list(filter(lambda x: x.next.name != "hr" and x != "\n" and x != "hr" and x.name != "hr", b_s.select_one(".method-body").contents))
 
-    first_idx = [idx for idx, val in enumerate(full_content) if val.ing_name == "h4"].pop(0)
-    last_idx = [idx for idx, val in enumerate(full_content) if val.ing_name == "div"].pop(0)
+    first_idx = [idx for idx, val in enumerate(full_content) if val.name == "h4"].pop(0)
+    last_idx = [idx for idx, val in enumerate(full_content) if val.name == "div"].pop(0)
     full_content = full_content[first_idx:last_idx]
 
     titles = []
@@ -22,7 +22,7 @@ for link in p_with_h4:
         if i.name == "h4":
             titles.append(i)
 
-    grouped = [list(grp) for match, grp in it.groupby(full_content, lambda condition: condition.ing_name == "p") if match]
+    grouped = [list(grp) for match, grp in it.groupby(full_content, lambda condition: condition.name == "p") if match]
 
     final = [sub[item] for item in range(len(grouped)) for sub in [titles, grouped]]
 
@@ -38,14 +38,14 @@ for link in p_with_h4:
         content = [i.get_text().strip() for i in content]
         sub_obj["content"] = get_value(content)
         recipe_p.append(sub_obj)
-    recipes_p.append(recipe_p)
+    # recipes_p.append(recipe_p)
     dish = {
-        "name": link,
-        "recipe": recipes_p
+        "link": link,
+        "recipe": recipe_p
     }
     dishes_prep_p.append(dish)
     recipe_p = []
-    recipes_p = []
+    # recipes_p = []
 
     json_object = json.dumps(dishes_prep_p, indent=4)
 

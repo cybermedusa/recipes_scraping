@@ -1,21 +1,22 @@
 from bs4 import BeautifulSoup
 from requests import get
-from links_array import links
+from links_array import hr_link
 import json
 from functions import get_value
 
 recipes = []
 dishes = []
-for link in links:
+for link in hr_link:
     new_page = get(link)
-    b_s = BeautifulSoup(new_page.content, 'html.parser')
     recipe = []
-    recipe_obj = {}
+    b_s = BeautifulSoup(new_page.content, 'html.parser')
     contents = list(filter(lambda x: x != '\n', b_s.select_one(".ingredients-body").contents))
-
-    if len(contents) % 2 != 0:
-        contents.insert(0, 'Ingredients')
-
+    contents = list(filter(lambda x: x.name != "div", contents))
+    x = contents
+    if contents[1].next.name == "strong":
+        contents = contents[1:]
+    else:
+        contents[0] = "Ingredients"
     for i in range(0, len(contents), 2):
         title = contents[i]
         content = contents[i + 1]
@@ -30,7 +31,6 @@ for link in links:
         clear_content = [j.get_text().strip() for j in list(filter(lambda x: x != '\n', content.contents))]
         recipe_obj['content'] = get_value(clear_content)
         recipe.append(recipe_obj)
-
     dish = {
         "link": link,
         "ingredients": recipe
@@ -40,5 +40,5 @@ for link in links:
 
     json_object = json.dumps(dishes, indent=4)
 
-    with open("ingredients_alone.json", "w") as outfile:
+    with open("ingredients_hr.json", "w") as outfile:
         outfile.write(json_object)

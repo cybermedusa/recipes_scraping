@@ -25,14 +25,14 @@ for link in h4_links:
         content = [content.get_text().strip()]
         sub_obj['content'] = get_value(content)
         recipe_h4.append(sub_obj)
-    recipes_h4.append(recipe_h4)
+    # recipes_h4.append(recipe_h4)
     dish = {
-        "name": link,
-        "recipe": recipes_h4
+        "link": link,
+        "recipe": recipe_h4
     }
     dishes_prep_h4.append(dish)
     recipe_h4 = []
-    recipes_h4 = []
+    # recipes_h4 = []
 
     json_object = json.dumps(dishes_prep_h4, indent=4)
 

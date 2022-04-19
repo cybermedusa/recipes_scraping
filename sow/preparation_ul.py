@@ -26,14 +26,14 @@ for link in ul_links:
         content = [content.get_text().strip()]
         sub_obj['content'] = get_value(content)
         recipe_ul.append(sub_obj)
-    recipes_ul.append(recipe_ul)
+    # recipes_ul.append(recipe_ul)
     dish = {
-        "name": link,
-        "recipe": recipes_ul
+        "link": link,
+        "recipe": recipe_ul
     }
     dishes_prep_ul.append(dish)
     recipe_ul = []
-    recipes_ul = []
+    # recipes_ul = []
 
     json_object = json.dumps(dishes_prep_ul, indent=4)
 
